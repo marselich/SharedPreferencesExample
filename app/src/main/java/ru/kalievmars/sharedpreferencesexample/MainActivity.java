@@ -5,19 +5,23 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.Set;
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener {
+public class MainActivity extends AppCompatActivity  {
 
     EditText editText;
     Button btnSave, btnLoad;
     SharedPreferences sharedPreferences;
     final String SAVED_TEXT = "saved text";
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -28,23 +32,35 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         btnSave = findViewById(R.id.btnSave);
         btnLoad = findViewById(R.id.btnLoad);
 
-        btnSave.setOnClickListener(this);
-        btnLoad.setOnClickListener(this);
+//        btnSave.setOnClickListener(this);
+//        btnLoad.setOnClickListener(this);
+
+        loadText();
+        editText.setOnEditorActionListener(editorActionListener);
     }
 
-    @Override
-    public void onClick(View v) {
-        switch (v.getId()) {
-            case R.id.btnSave:
-                saveText();
-                break;
-            case R.id.btnLoad:
-                loadText();
-                break;
-            default:
-                break;
+    private TextView.OnEditorActionListener editorActionListener = new TextView.OnEditorActionListener() {
+        @Override
+        public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+            saveText();
+            Log.d(SAVED_TEXT, editText.getText().toString());
+            return true;
         }
-    }
+    };
+
+//    @Override
+//    public void onClick(View v) {
+//        switch (v.getId()) {
+//            case R.id.btnSave:
+//                saveText();
+//                break;
+//            case R.id.btnLoad:
+//                loadText();
+//                break;
+//            default:
+//                break;
+//        }
+//    }
 
     private void loadText() {
         sharedPreferences = getPreferences(MODE_PRIVATE);
@@ -59,5 +75,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         ed.putString(SAVED_TEXT, editText.getText().toString());
         ed.commit();
         Toast.makeText(this, "Текст сохранен!", Toast.LENGTH_LONG).show();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        saveText();
     }
 }
